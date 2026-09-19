@@ -31,7 +31,7 @@ c-sources = ["src/std/io.c"]
 Then import it from Kelyra:
 
 ```kelyra
-include std.io;
+import std.io;
 
 pub fn main() -> i32 {
   std.io.println("hello");

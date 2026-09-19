@@ -1,27 +1,27 @@
 module std.io;
-include c "io.h";
+import c "io.h";
 
-pub fn print(text: c.char*) -> c.int {
+pub fn print(text: c.char*) -> i32 {
   return c.kstd_io_print(text);
 }
 
-pub fn println(text: c.char*) -> c.int {
+pub fn println(text: c.char*) -> i32 {
   return c.kstd_io_println(text);
 }
 
-pub fn eprint(text: c.char*) -> c.int {
+pub fn eprint(text: c.char*) -> i32 {
   return c.kstd_io_eprint(text);
 }
 
-pub fn eprintln(text: c.char*) -> c.int {
+pub fn eprintln(text: c.char*) -> i32 {
   return c.kstd_io_eprintln(text);
 }
 
-pub fn newline() -> c.int {
+pub fn newline() -> i32 {
   return c.kstd_io_newline();
 }
 
-pub fn print_int(value: c.longlong) -> c.int {
+pub fn print_int(value: i64) -> i32 {
   return c.kstd_io_print_int(value);
 }
 
@@ -29,10 +29,10 @@ pub fn read_line() -> c.char* {
   return c.kstd_io_read_line();
 }
 
-pub fn read_int() -> c.longlong {
+pub fn read_int() -> i64 {
   return c.kstd_io_read_int();
 }
 
-pub fn flush() -> c.int {
+pub fn flush() -> i32 {
   return c.kstd_io_flush();
 }
