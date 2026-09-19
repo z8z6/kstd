@@ -1,0 +1,9 @@
+include std.io;
+
+pub fn main() -> i32 {
+  std.io.print("answer = ");
+  std.io.print_int(42);
+  std.io.newline();
+  std.io.println(std.io.read_line());
+  return 0;
+}

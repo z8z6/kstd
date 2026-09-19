@@ -1,0 +1,15 @@
+[project]
+name = "kstd-io"
+version = "0.1.0"
+entry = "src/io_example.kly"
+
+[build]
+compiler = "../kelyra/build/bin/kelyra"
+output = "build/kstd-io"
+optimization = 0
+safe-level = 1
+c-sources = ["src/std/io.c"]
+c-args = []
+
+[test]
+sources = ["src/io_example.kly"]
