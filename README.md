@@ -1,6 +1,12 @@
 # Kstd
 
-Kstd is the standard library for Kelyra. The initial `std.io` module provides:
+Kstd is the standard library for Kelyra. Its first pure Kelyra modules are:
+
+- `std.ascii`: ASCII byte classification and case conversion
+- `std.math.integer`: basic `i64` integer utilities
+- `std.math.basic`: basic `f32` and `f64` utilities
+
+The current `std.io` module provides:
 
 - `print`, `println`, `eprint`, and `eprintln`
 - `newline` and `flush`
@@ -9,6 +15,8 @@ Kstd is the standard library for Kelyra. The initial `std.io` module provides:
 
 The Kelyra module is `src/std/io.kly`; its small C runtime is
 `src/std/io.c`. Kstd itself is built by Kelp using the checked-in `kelp.toml`.
+The boundary between pure library code, platform code, and C compatibility is
+documented in [`doc/glibc-scope.md`](doc/glibc-scope.md).
 From the repository root:
 
 ```sh
@@ -46,4 +54,5 @@ Test:
 ```sh
 kelp test
 sh tests/io.sh
+sh tests/core.sh
 ```

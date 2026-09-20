@@ -12,4 +12,4 @@ c-sources = ["src/std/io.c"]
 c-args = []
 
 [test]
-sources = ["src/io_example.kly"]
+sources = ["src/ascii_example.kly", "src/io_example.kly", "src/math_example.kly"]
