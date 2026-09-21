@@ -110,7 +110,7 @@ pub class String {
       return;
     }
     let next: usize = reserved * 2;
-    if next < needed {
+    if next < reserved || next < needed {
       next = needed;
     }
     let grown: *u8 = reallocate(data, next);
