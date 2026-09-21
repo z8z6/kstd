@@ -14,26 +14,33 @@ The current `std.io` module provides:
 - `read_line`, backed by a thread-local 4096-byte buffer
 
 The Kelyra module is `src/std/io.kly`; its small C runtime is
-`src/std/io.c`. Kstd itself is built by Kelp using the checked-in `kelp.toml`.
-The boundary between pure library code, platform code, and C compatibility is
-documented in [`doc/glibc-scope.md`](doc/glibc-scope.md).
+`src/std/io.c`. Kstd itself is built by Kelp using the checked-in `kelp.toml`,
+which declares it as a `library` whose entry `src/kstd.kly` imports every public
+module. The boundary between pure library code, platform code, and C
+compatibility is documented in [`doc/glibc-scope.md`](doc/glibc-scope.md).
 From the repository root:
 
 ```sh
 . ./env.sh
 kelp check
 kelp build
-kelp run
+kelp test
 ```
+
+`kelp build` produces the library object `build/kstd.o`; a program links it
+instead of recompiling the standard modules.
 
 `env.sh` aliases the sibling Kelp and Kelyra build paths for the current shell.
 
-Until Kelp gains package installation, copy `src/std` into a project's `src`
-directory and add the runtime to its `kelp.toml`:
+A consumer depends on the library and links its object. With Kelp, point a
+dependency at this repository and let Kelp pass `--external-path` and
+`--link-input`; to compile directly:
 
-```toml
-[build]
-c-sources = ["src/std/io.c"]
+```sh
+kelyra --emit-exe \
+  --module-path=kstd/src --external-path=kstd/src \
+  --link-input=kstd/build/kstd.o --c-source=kstd/src/std/io.c \
+  -o app main.kly
 ```
 
 Then import it from Kelyra:

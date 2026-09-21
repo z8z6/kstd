@@ -1,15 +1,18 @@
 [project]
-name = "kstd-io"
+name = "kstd"
 version = "0.1.0"
-entry = "src/io_example.kly"
+entry = "src/kstd.kly"
 
 [build]
 compiler = "../kelyra/build/bin/kelyra"
-output = "build/kstd-io"
+kind = "library"
 optimization = 0
 safe-level = 1
 c-sources = ["src/std/io.c"]
 c-args = []
+
+[package]
+output = "build/kstd-0.1.0.tar.gz"
 
 [test]
 sources = ["src/ascii_example.kly", "src/io_example.kly", "src/math_example.kly"]
