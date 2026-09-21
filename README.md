@@ -55,7 +55,7 @@ kelp build
 kelp test
 ```
 
-`kelp build` produces the library object `build/kstd.o`; a program links it
+`kelp build` produces the library object `.kelp/build/kstd.o`; a program links it
 instead of recompiling the standard modules.
 
 `env.sh` aliases the sibling Kelp and Kelyra build paths for the current shell.
@@ -67,7 +67,7 @@ dependency at this repository and let Kelp pass `--external-path` and
 ```sh
 kelyra --emit-exe \
   --module-path=kstd/src --external-path=kstd/src \
-  --link-input=kstd/build/kstd.o \
+  --link-input=kstd/.kelp/build/kstd.o \
   --c-source=kstd/src/std/io.c \
   --c-source=kstd/src/std/alloc.c \
   --c-source=kstd/src/std/string.c \
