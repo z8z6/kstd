@@ -1,0 +1,42 @@
+import std.io;
+import std.string;
+
+// Exercises the allocation wrapper and the String class through its whole
+// surface; the returned code names the first check that failed.
+pub fn main() -> i32 {
+  let text = std.string.String("hello");
+  if text.length() != 5 {
+    return 1;
+  }
+  text.append(", world");
+  text.append_byte(33);
+  if text.length() != 13 {
+    return 2;
+  }
+  if !text.equals("hello, world!") {
+    return 3;
+  }
+  if text.at(0) != 104 {
+    return 4;
+  }
+  if text.at(text.length()) != 0 {
+    return 5;
+  }
+  text.set(0, 72);
+  if !text.equals("Hello, world!") {
+    return 6;
+  }
+  if text.empty() {
+    return 7;
+  }
+  text.clear();
+  if !text.empty() || text.length() != 0 {
+    return 8;
+  }
+  text.assign("again");
+  if !text.equals("again") {
+    return 9;
+  }
+  std.io.println(text.data_pointer());
+  return 0;
+}

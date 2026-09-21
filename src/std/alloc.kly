@@ -1,0 +1,45 @@
+module std.alloc;
+
+import c "alloc.h";
+
+// Allocates `size` bytes. The result is null when the request cannot be met.
+pub fn allocate(size: usize) -> *u8 {
+  return c.kstd_alloc(size);
+}
+
+// Resizes an earlier allocation, preserving its contents. On failure the old
+// allocation is left untouched and null is returned.
+pub fn reallocate(pointer: *u8, size: usize) -> *u8 {
+  return c.kstd_realloc(pointer, size);
+}
+
+// Releases memory returned by allocate or reallocate. Null is accepted.
+pub fn release(pointer: *u8) -> void {
+  c.kstd_free(pointer);
+}
+
+// Copies `count` bytes from source to destination. The ranges must not overlap.
+pub fn copy(destination: *u8, source: *u8, count: usize) -> void {
+  c.kstd_copy(destination, source, count);
+}
+
+// Writes `count` copies of `value`.
+pub fn fill(destination: *u8, value: u8, count: usize) -> void {
+  c.kstd_fill(destination, value, count);
+}
+
+// Reads the byte at `index`. The caller guarantees the index is in range.
+pub fn load(pointer: *u8, index: usize) -> u8 {
+  return c.kstd_load(pointer, index);
+}
+
+// Writes `value` at `index`. The caller guarantees the index is in range.
+pub fn store(pointer: *u8, index: usize, value: u8) -> void {
+  c.kstd_store(pointer, index, value);
+}
+
+// Reports whether a pointer is null, which is how allocation failure is
+// observed without a null literal.
+pub fn is_null(pointer: *u8) -> bool {
+  return c.kstd_is_null(pointer) != 0;
+}

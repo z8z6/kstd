@@ -11,11 +11,15 @@ trap 'rm -f "$stdout" "$stderr"' EXIT HUP INT TERM
 
 cd "$root"
 # Build the library object, then link the example against it: the example only
-# declares the std modules and resolves their definitions from the object.
+# declares the std modules and resolves their definitions from the object. The
+# object references every C runtime the library carries.
 "$kelp" build
 "$compiler" --emit-exe \
   --module-path="$root/src" --external-path="$root/src" \
-  --link-input="$root/build/kstd.o" --c-source="$root/src/std/io.c" \
+  --link-input="$root/build/kstd.o" \
+  --c-source="$root/src/std/io.c" \
+  --c-source="$root/src/std/alloc.c" \
+  --c-source="$root/src/std/string.c" \
   -o "$output" "$root/src/io_example.kly"
 printf 'hello from input\n' | "$output" >"$stdout" 2>"$stderr"
 test ! -s "$stderr"
