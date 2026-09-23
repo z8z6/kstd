@@ -1,7 +1,17 @@
 module std.string;
 
 import std.alloc.*;
-import c "string.h";
+
+fn text_length(text: *c.char) -> usize {
+  if text as usize == 0 {
+    return 0;
+  }
+  let size: usize = 0;
+  while load(text as *u8, size) != 0 {
+    size = size + 1;
+  }
+  return size;
+}
 
 // An owned, mutable byte string. The buffer is allocated through std.alloc and
 // released by deinit, so a String local cleans up when it leaves its scope.
@@ -59,19 +69,19 @@ pub class String {
 
   // Replaces the contents with a copy of `text`.
   pub fn assign(text: *c.char) -> void {
-    let incoming: usize = c.kstd_text_length(text);
+    let incoming: usize = text_length(text);
     reserve(incoming + 1);
-    if is_null(data) {
+    if is_null(data) || reserved <= incoming {
       return;
     }
-    c.kstd_text_copy_at(data, 0, text, incoming);
+    copy(data, text as *u8, incoming);
     size = incoming;
     store(data, size, 0);
   }
 
   // Appends a copy of `text`.
   pub fn append(text: *c.char) -> void {
-    append_bytes(text, c.kstd_text_length(text));
+    append_bytes(text, text_length(text));
   }
 
   // Appends one byte.
@@ -95,12 +105,22 @@ pub class String {
 
   // Compares the contents with a C string.
   pub fn equals(text: *c.char) -> bool {
-    return c.kstd_text_equals(data, size, text) != 0;
+    if size != text_length(text) {
+      return false;
+    }
+    let index: usize = 0;
+    while index < size {
+      if load(data, index) != load(text as *u8, index) {
+        return false;
+      }
+      index = index + 1;
+    }
+    return true;
   }
 
   // Pointer to the null-terminated bytes, valid until the next mutation.
   pub fn data_pointer() -> *c.char {
-    return c.kstd_text_data(data);
+    return data as *c.char;
   }
 
   // Grows the allocation to hold at least `needed` bytes, including the
@@ -124,10 +144,10 @@ pub class String {
   // Appends `count` bytes read from a C string.
   fn append_bytes(text: *c.char, count: usize) -> void {
     reserve(size + count + 1);
-    if is_null(data) {
+    if is_null(data) || reserved <= size + count {
       return;
     }
-    c.kstd_text_copy_at(data, size, text, count);
+    copy((data as usize + size) as *u8, text as *u8, count);
     size = size + count;
     store(data, size, 0);
   }

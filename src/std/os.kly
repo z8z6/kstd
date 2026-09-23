@@ -1,0 +1,61 @@
+module std.os;
+
+@cfg(os="linux", arch="x86_64")
+import std.os.linux;
+@cfg(os="windows", arch="x86_64")
+import std.os.windows;
+
+@cfg(os="linux", arch="x86_64")
+pub fn process_id() -> i64 {
+  return std.os.linux.process_id();
+}
+
+@cfg(os="windows", arch="x86_64")
+pub fn process_id() -> u32 {
+  return std.os.windows.process_id();
+}
+
+@cfg(os="linux", arch="x86_64")
+pub fn monotonic_millis() -> i64 {
+  return std.os.linux.monotonic_millis();
+}
+
+@cfg(os="windows", arch="x86_64")
+pub fn monotonic_millis() -> i64 {
+  return std.os.windows.monotonic_millis();
+}
+
+@cfg(os="linux", arch="x86_64")
+pub fn sleep_millis(milliseconds: i64) -> i64 {
+  return std.os.linux.sleep_millis(milliseconds);
+}
+
+@cfg(os="windows", arch="x86_64")
+pub fn sleep_millis(milliseconds: u32) -> void {
+  std.os.windows.sleep_millis(milliseconds);
+}
+
+@cfg(os="linux", arch="x86_64")
+pub fn environment(name: *c.char) -> *c.char {
+  return std.os.linux.environment(name);
+}
+
+@cfg(os="windows", arch="x86_64")
+pub fn environment(name: *c.char, output: *u8, capacity: u32) -> u32 {
+  return std.os.windows.environment(name, output, capacity);
+}
+
+@cfg(os="linux", arch="x86_64")
+pub fn working_directory(output: *u8, capacity: usize) -> i64 {
+  return std.os.linux.working_directory(output, capacity);
+}
+
+@cfg(os="windows", arch="x86_64")
+pub fn working_directory(output: *u8, capacity: u32) -> u32 {
+  return std.os.windows.working_directory(output, capacity);
+}
+
+@cfg(os="windows", arch="x86_64")
+pub fn last_error() -> u32 {
+  return std.os.windows.last_error();
+}

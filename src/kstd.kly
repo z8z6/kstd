@@ -1,11 +1,15 @@
 module kstd;
 
-// Library entry point: it imports every public standard module so that one
-// linked object carries the whole library. Programs build against the library
-// and link this object instead of recompiling the modules.
+// Library entry point: import modules that can be linked without a host CRT.
+// Other modules remain available from source for host programs.
 import std.alloc;
+import std.annotation;
 import std.ascii;
+import std.file;
 import std.io;
-import std.math.basic;
 import std.math.integer;
+import std.option;
+import std.reflect;
+import std.signal;
 import std.string;
+import std.thread;

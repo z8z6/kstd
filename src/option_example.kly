@@ -1,0 +1,37 @@
+import std.option;
+import std.alloc;
+
+class Token {
+  value: *i32;
+
+  init(number: i32) {
+    value = std.alloc.allocate(4) as *i32;
+    if value as usize != 0 { *value = number; }
+  }
+
+  fn copy(other: *Token) {
+    value = std.alloc.allocate(4) as *i32;
+    if value as usize != 0 { *value = *other.value; }
+  }
+
+  fn move(other: *Token) {
+    value = other.value;
+    other.value = 0 as *i32;
+  }
+
+  deinit() { std.alloc.release(value as *u8); }
+}
+
+@main
+fn run() -> i32 {
+  let present = std.option.some<Token>(Token(42));
+  if !present.ok { return 1; }
+  let copied = present;
+  let result = copied.value();
+  let absent = std.option.none<Token>();
+  if absent.ok || absent.err != 0 { return 2; }
+  let failed = std.option.failure<Token>(7);
+  if failed.ok || failed.err != 7 { return 3; }
+  if result.value as usize == 0 { return 4; }
+  return *result.value - 42;
+}

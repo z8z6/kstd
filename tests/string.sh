@@ -15,9 +15,6 @@ mkdir -p "$root/build"
 "$compiler" --emit-exe \
   --module-path="$root/src" --external-path="$root/src" \
   --link-input="$root/.kelp/build/kstd.o" \
-  --c-source="$root/src/std/io.c" \
-  --c-source="$root/src/std/alloc.c" \
-  --c-source="$root/src/std/string.c" \
   -o "$output" "$root/src/string_example.kly"
 "$output" >"$stdout"
 test "$(cat "$stdout")" = "again"

@@ -3,6 +3,7 @@ import std.string;
 
 // Exercises the allocation wrapper and the String class through its whole
 // surface; the returned code names the first check that failed.
+@main
 pub fn main() -> i32 {
   let text = std.string.String("hello");
   if text.length() != 5 {

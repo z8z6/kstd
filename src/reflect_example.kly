@@ -1,0 +1,50 @@
+import std.reflect;
+
+@reflect
+class Actor {
+  pub health: i32;
+  hidden: i32;
+  @reflect id: u64;
+}
+
+class Sparse {
+  pub unmarked: i32;
+  @reflect chosen: i32;
+}
+
+@reflect
+class Generic<T> { pub item: T; }
+
+@main
+fn run() -> i32 {
+  let actor = Actor();
+  actor.health = 42;
+  let type = std.reflect.type_of<Actor>();
+  if !type.has_field("health") || !type.has_field("id") || type.has_field("hidden") {
+    return 1;
+  }
+  if type.field_count() != 2 { return 2; }
+  let found = type.field("health");
+  if !found.ok { return 3; }
+  let field = found.value();
+  if field.type().id != std.reflect.type_of<i32>().id { return 4; }
+  let object = std.reflect.value<Actor>(&actor);
+  let read = std.reflect.read<i32>(field, object);
+  if !read.ok || read.value() != 42 { return 5; }
+  let written = std.reflect.write<i32>(field, object, 77);
+  if !written.ok || actor.health != 77 { return 6; }
+  let wrong_type = std.reflect.read<u64>(field, object);
+  if wrong_type.ok || wrong_type.err != 2 { return 8; }
+  let sparse = std.reflect.type_of<Sparse>();
+  if sparse.has_field("unmarked") || !sparse.has_field("chosen") { return 7; }
+  let other = Sparse();
+  let wrong_owner = std.reflect.read<i32>(field, std.reflect.value<Sparse>(&other));
+  if wrong_owner.ok || wrong_owner.err != 1 { return 9; }
+  let generic = std.reflect.type_of<Generic<i32>>();
+  if !generic.has_field("item") { return 10; }
+  let item = generic.field("item");
+  if !item.ok || item.value().type().id != std.reflect.type_of<i32>().id {
+    return 11;
+  }
+  return 0;
+}

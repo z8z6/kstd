@@ -1,5 +1,6 @@
 import std.ascii.*;
 
+@main
 pub fn main() -> i32 {
   if !is_digit(53) || is_digit(65) {
     return 1;

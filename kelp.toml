@@ -7,9 +7,10 @@ entry = "src/kstd.kly"
 compiler = "../kelyra/build/bin/kelyra"
 kind = "library"
 optimization = 0
-safe-level = 1
-c-sources = ["src/std/io.c", "src/std/alloc.c", "src/std/string.c"]
+safe-level = 0
+c-sources = []
 c-args = []
+windows-import-libraries = ["Synchronization.lib"]
 
 [package]
 output = "kstd-0.1.0.tar.gz"

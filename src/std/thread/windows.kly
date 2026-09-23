@@ -1,0 +1,52 @@
+@cfg(os="windows", arch="x86_64") module std.thread.windows;
+
+import std.win32.error;
+
+@extern("GetCurrentThreadId")
+@callconv("system")
+fn win_current_thread_id() -> u32;
+
+@extern("SwitchToThread")
+@callconv("system")
+fn win_switch_to_thread() -> i32;
+
+@extern("WaitOnAddress")
+@callconv("system")
+fn win_wait_on_address(address: *u32, expected: *u32, size: usize,
+                       milliseconds: u32) -> i32;
+
+@extern("WakeByAddressSingle")
+@callconv("system")
+fn win_wake_by_address_single(address: *u32) -> void;
+
+@extern("WakeByAddressAll")
+@callconv("system")
+fn win_wake_by_address_all(address: *u32) -> void;
+
+pub fn current_id() -> u32 {
+  return win_current_thread_id();
+}
+
+// Returns true only when Windows actually switched to another thread.
+pub fn yield_now() -> bool {
+  return win_switch_to_thread() != 0;
+}
+
+// Returns zero after waking, or negative GetLastError. The caller must
+// recheck the word using atomic operations, even after a successful wait.
+pub fn wait_word(address: *u32, expected: u32) -> i64 {
+  let comparison: u32 = expected;
+  if win_wait_on_address(address, &comparison, 4, 4294967295) == 0 {
+    return -(std.win32.error.last_error() as i64);
+  }
+  return 0;
+}
+
+// Windows does not report the number of waiters woken.
+pub fn wake_one(address: *u32) -> void {
+  win_wake_by_address_single(address);
+}
+
+pub fn wake_all(address: *u32) -> void {
+  win_wake_by_address_all(address);
+}
