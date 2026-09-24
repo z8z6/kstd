@@ -13,6 +13,6 @@ for example in option reflect; do
   "$compiler" --emit-exe --runtime=freestanding \
     --module-path="$root/src" --external-path="$root/src" \
     --link-input="$root/.kelp/build/kstd.o" \
-    -o "$temporary/$example" "$root/src/${example}_example.kly"
+    -o "$temporary/$example" "$root/examples/${example}_example.kly"
   "$temporary/$example"
 done

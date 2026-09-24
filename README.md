@@ -64,14 +64,17 @@ writing. Handles and negative error values are native to the target OS; see
 time via `@cfg(os=..., arch=...)`. Both backends are written in Kelyra; see
 [`doc/os.md`](doc/os.md) for APIs, platform selection and FFI limitations.
 
-`std.thread` exposes native thread IDs, scheduler yield, and 32-bit wait/wake
-primitives; `std.signal` exposes Linux signal sending or Windows console
-control events. They are freestanding-safe low-level calls, not thread
-creation or portable signal handling. See [`doc/thread-signal.md`](doc/thread-signal.md).
+`std.thread` exposes native thread IDs, scheduler yield, 32-bit wait/wake
+primitives and Windows callback-based thread creation. `std.signal` exposes
+Linux signal sending or Windows console control events and handlers. The
+low-level operations are freestanding safe; Linux callback APIs live in
+`std.thread.hosted` and `std.signal.hosted` and require libc and pthreads.
+See [`doc/thread-signal.md`](doc/thread-signal.md).
 
 Kstd's alloc, io, file and string implementations are Kelyra sources; the
 build has no C sources. Kelp uses the checked-in `kelp.toml` to build a library
-object. `src/kstd.kly` imports the freestanding-safe modules. `std.os` remains
+object. Library sources live in `src/`, while runnable sample programs live in
+`examples/`. `src/kstd.kly` imports the freestanding-safe modules. `std.os` remains
 available as a separate host module because its Linux environment lookup
 references libc `getenv`. `std.math.basic` remains source-only because Windows
 floating-point object code currently requires the MSVC `_fltused` runtime
@@ -132,5 +135,6 @@ sh tests/core.sh
 sh tests/os.sh
 sh tests/freestanding.sh
 sh tests/thread_signal.sh
+sh tests/callback.sh
 sh tests/reflect.sh
 ```

@@ -2,6 +2,49 @@
 
 import std.win32.error;
 
+@extern("CreateThread")
+@callconv("system")
+fn win_create_thread(attributes: *u8, stack_size: usize,
+                     callback: fn(*u8) -> u32, context: *u8,
+                     flags: u32, thread_id: *u32) -> *u8;
+
+@extern("WaitForSingleObject")
+@callconv("system")
+fn win_wait_for_single_object(handle: *u8, milliseconds: u32) -> u32;
+
+@extern("GetExitCodeThread")
+@callconv("system")
+fn win_get_exit_code_thread(handle: *u8, exit_code: *u32) -> i32;
+
+@extern("CloseHandle")
+@callconv("system")
+fn win_close_handle(handle: *u8) -> i32;
+
+// The caller owns the returned handle and must close it after join.
+// The callback and context must remain valid until the thread exits.
+pub fn spawn(callback: fn(*u8) -> u32, context: *u8,
+             thread_id: *u32) -> *u8 {
+  return win_create_thread(0 as *u8, 0, callback, context, 0, thread_id);
+}
+
+// Waits indefinitely and writes the thread's exit code. Does not close handle.
+pub fn join(handle: *u8, exit_code: *u32) -> i64 {
+  if win_wait_for_single_object(handle, 4294967295) != 0 {
+    return -(std.win32.error.last_error() as i64);
+  }
+  if win_get_exit_code_thread(handle, exit_code) == 0 {
+    return -(std.win32.error.last_error() as i64);
+  }
+  return 0;
+}
+
+pub fn close(handle: *u8) -> i64 {
+  if win_close_handle(handle) == 0 {
+    return -(std.win32.error.last_error() as i64);
+  }
+  return 0;
+}
+
 @extern("GetCurrentThreadId")
 @callconv("system")
 fn win_current_thread_id() -> u32;

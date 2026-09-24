@@ -8,7 +8,22 @@ fn win_generate_console_ctrl_event(event: u32, process_group: u32) -> i32;
 
 @extern("SetConsoleCtrlHandler")
 @callconv("system")
-fn win_set_console_ctrl_handler(handler: *u8, add: i32) -> i32;
+fn win_set_console_callback(handler: fn(u32) -> i32, add: i32) -> i32;
+
+// Windows may invoke the handler on a new thread. Keep it valid until removed.
+pub fn register_console_handler(handler: fn(u32) -> i32) -> i64 {
+  if win_set_console_callback(handler, 1) == 0 {
+    return -(std.win32.error.last_error() as i64);
+  }
+  return 0;
+}
+
+pub fn unregister_console_handler(handler: fn(u32) -> i32) -> i64 {
+  if win_set_console_callback(handler, 0) == 0 {
+    return -(std.win32.error.last_error() as i64);
+  }
+  return 0;
+}
 
 // CTRL_C_EVENT=0, CTRL_BREAK_EVENT=1. The target must share a console.
 // Returns zero or negative GetLastError; not equivalent to POSIX kill.
@@ -29,7 +44,7 @@ pub fn ignore_control_c(ignore: bool) -> i64 {
   if ignore {
     add = 1;
   }
-  if win_set_console_ctrl_handler(0 as *u8, add) == 0 {
+  if win_set_console_callback(0 as fn(u32) -> i32, add) == 0 {
     return -(std.win32.error.last_error() as i64);
   }
   return 0;

@@ -15,6 +15,6 @@ mkdir -p "$root/build"
 "$compiler" --emit-exe \
   --module-path="$root/src" --external-path="$root/src" \
   --link-input="$root/.kelp/build/kstd.o" \
-  -o "$output" "$root/src/string_example.kly"
+  -o "$output" "$root/examples/string_example.kly"
 "$output" >"$stdout"
 test "$(cat "$stdout")" = "again"

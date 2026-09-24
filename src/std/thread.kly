@@ -5,6 +5,22 @@ import std.thread.linux;
 @cfg(os="windows", arch="x86_64")
 import std.thread.windows;
 
+@cfg(os="windows", arch="x86_64")
+pub fn spawn(callback: fn(*u8) -> u32, context: *u8,
+             thread_id: *u32) -> *u8 {
+  return std.thread.windows.spawn(callback, context, thread_id);
+}
+
+@cfg(os="windows", arch="x86_64")
+pub fn join(handle: *u8, exit_code: *u32) -> i64 {
+  return std.thread.windows.join(handle, exit_code);
+}
+
+@cfg(os="windows", arch="x86_64")
+pub fn close(handle: *u8) -> i64 {
+  return std.thread.windows.close(handle);
+}
+
 @cfg(os="linux", arch="x86_64")
 pub fn current_id() -> i64 {
   return std.thread.linux.current_id();

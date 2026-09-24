@@ -17,7 +17,7 @@ mkdir -p "$root/build"
 "$compiler" --emit-exe \
   --module-path="$root/src" --external-path="$root/src" \
   --link-input="$root/.kelp/build/kstd.o" \
-  -o "$output" "$root/src/io_example.kly"
+  -o "$output" "$root/examples/io_example.kly"
 printf 'hello from input\n' | "$output" >"$stdout" 2>"$stderr"
 test ! -s "$stderr"
 test "$(cat "$stdout")" = "answer = 42

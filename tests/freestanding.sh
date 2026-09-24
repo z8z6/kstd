@@ -12,7 +12,7 @@ cd "$root"
 "$compiler" --emit-exe --runtime=freestanding \
   --module-path="$root/src" --external-path="$root/src" \
   --link-input="$root/.kelp/build/kstd.o" \
-  -o "$temporary/program" "$root/src/freestanding_example.kly"
+  -o "$temporary/program" "$root/examples/freestanding_example.kly"
 cd "$temporary"
 ./program >stdout
 test "$(cat stdout)" = "ok"

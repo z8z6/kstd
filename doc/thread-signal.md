@@ -1,7 +1,8 @@
 # Thread and signal system APIs
 
-`std.thread` and `std.signal` provide low-level, freestanding-safe OS calls on
-Linux x86-64 and Windows x64. They contain no C implementation or CRT calls.
+`std.thread` and `std.signal` provide low-level OS calls on Linux x86-64 and
+Windows x64. Their original wait, wake, ID, and event APIs remain freestanding
+safe. Linux callback APIs use libc/pthreads and require a hosted executable.
 Platform selection uses `@cfg(os="...", arch="x86_64")`.
 
 | Module | Linux x86-64 | Windows x64 |
@@ -15,9 +16,9 @@ Platform selection uses `@cfg(os="...", arch="x86_64")`.
 `wait_word` compares one aligned 32-bit word and waits while it has the
 expected value. Callers must change the word with an atomic operation *before*
 waking other threads, and must recheck it in a loop after waking: spurious
-wakeups and races are allowed. This module does not yet provide atomic writes,
-a mutex, or a thread creation/join API, so it is a building block rather than
-a safe concurrency abstraction. Linux `wait_word` returns `-11` (`EAGAIN`) if
+wakeups and races are allowed. This module does not yet provide atomic writes
+or a mutex, so it is a building block rather than a safe concurrency
+abstraction. Linux `wait_word` returns `-11` (`EAGAIN`) if
 the value already differs. Windows `wait_word` currently waits indefinitely.
 The public `std.thread` signatures use `i64` on both platforms; Linux `wake_*`
 reports a nonnegative wake count whereas Windows returns zero because its API
@@ -30,12 +31,24 @@ are **not** POSIX signals. `send_console_event` only accepts event 0 (`CTRL_C`)
 or 1 (`CTRL_BREAK`), and requires a suitable shared console/process group.
 `ignore_control_c` toggles a process-wide, inheritable state; use with care.
 
-These APIs intentionally do not claim to implement `spawn`, `join`, or a
-signal-handler callback. Kelyra currently rejects function-value parameters
-on `@extern` declarations, which prevents a direct `CreateThread` or
-`SetConsoleCtrlHandler` callback signature. A Linux `clone` implementation
-also needs a sound stack, TLS and startup trampoline contract. Those features
-need language/runtime design before they can be exposed safely.
+Callback APIs use Kelyra `fn(...) -> ...` values. On Linux, import
+`std.thread.hosted` for `spawn` and `join`, which wrap `pthread_create` and
+`pthread_join`; the callback has type `fn(*u8) -> *u8`. Import
+`std.signal.hosted` for `install_handler`, which wraps libc `signal`, accepting
+`fn(i32) -> void` and returning the previous handler. `SIG_ERR` is represented
+by `(result as usize) == ((-1) as usize)`; check before using the result. Signal
+handlers run asynchronously: use only operations that are safe in that context.
+On Windows, `std.thread.spawn`, `join`, and `close`
+wrap `CreateThread`, `WaitForSingleObject`, `GetExitCodeThread`, and `CloseHandle`.
+Its callback type is `fn(*u8) -> u32`; `spawn` returns a handle owned by the
+caller, and `join` does not close it. `std.signal.register_console_handler`
+and `unregister_console_handler` wrap `SetConsoleCtrlHandler` with a
+`fn(u32) -> i32` handler. Keep callback code and its context alive until the
+thread exits or the handler is removed. Callback signatures must match the
+native ABI exactly; these APIs do not support capturing closures.
+
+`sh tests/callback.sh` exercises the hosted Linux thread and signal callbacks.
+`examples/callback_windows_example.kly` provides a Windows x64 compilation example.
 
 `sh tests/thread_signal.sh` runs a freestanding Linux smoke test. A Windows
 cross build can use `--target=x86_64-pc-windows-msvc` and link both

@@ -10,6 +10,6 @@ trap 'rm -f "$output" "$stdout"' EXIT HUP INT TERM
 cd "$root"
 "$compiler" --emit-exe \
   --module-path="$root/src" \
-  -o "$output" "$root/src/os_example.kly"
+  -o "$output" "$root/examples/os_example.kly"
 KSTD_OS_TEST=works "$output" >"$stdout"
 test "$(cat "$stdout")" = "works"
