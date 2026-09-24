@@ -11,6 +11,15 @@ pub annotation interface();
 @target(class)
 pub annotation final();
 
+@target(class)
+pub annotation singleton();
+
+@target(field, method)
+pub annotation static();
+
+@target(parameter)
+pub annotation forward();
+
 @target(method)
 pub annotation virtual();
 

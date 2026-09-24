@@ -7,10 +7,14 @@ Kstd is the standard library for Kelyra. Its pure Kelyra modules are:
 - `std.ascii`: ASCII byte classification and case conversion
 - `std.math.integer`: basic `i64` integer utilities
 - `std.math.basic`: basic `f32` and `f64` utilities
-- `std.option`: `Option<T>` with `ok`, `err: i32`, and `value()`; a missing
-  value has `ok == false` and `err == 0`, while a failure has nonzero `err`.
-  `T` need not have a default constructor. A present value currently uses one
-  allocation. Call `value()` only when `ok` is true.
+- `std.option`: `Option(name, argument)` parses one command-line option. It
+  recognizes an exact flag such as `--verbose` and an assigned value such as
+  `--output=file.txt`. Inspect `matched`, `has_value`, and `value`.
+- `std.result`: `Result<T, E>` holds a success value or an error value.
+  Construct it with `success<T, E>(value)` or `failure<T, E>(error)`. Check
+  `valid` before using `ok`, then call `value()` or `error()` for that branch.
+  Neither type needs a default constructor; each result allocates storage for
+  its active branch. `valid == false` indicates allocation failure.
 - `std.reflect`: opt-in runtime type and field lookup for `@reflect` classes,
   including `has_field`, `field`, `FieldInfo.type()`, and checked field
   `read<T>`/`write<T>`. See [`doc/reflection.md`](doc/reflection.md).

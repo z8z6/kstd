@@ -8,7 +8,8 @@ runtime metadata.
 ```kelyra
 import std.reflect;
 
-@reflect class Player {
+@reflect
+class Player {
   pub health: i32;
   @reflect private_id: u64;
 }
@@ -16,7 +17,7 @@ import std.reflect;
 let player = Player();
 let info = std.reflect.type_of<Player>();
 if info.has_field("health") {
-  let found = info.field("health"); // Option<FieldInfo>
+  let found = info.field("health"); // Result<FieldInfo, i32>
   if found.ok {
     let field = found.value();
     let field_type = field.type();  // TypeInfo: id and name
@@ -27,10 +28,11 @@ if info.has_field("health") {
 }
 ```
 
-`Option<T>.err` is `0` for an absent field and nonzero for an error. Runtime
-read and write use error codes `1` (wrong owner type), `2` (wrong field type),
-and `3` (null object pointer). Allocation failure is `12`. Check `ok` before
-calling `value()`. `write` uses normal class assignment, including copy/move
+`Result<T, i32>.error()` is `0` for an absent field and nonzero for an error.
+Runtime read and write use error codes `1` (wrong owner type), `2` (wrong field
+type), and `3` (null object pointer). Check `valid` before `ok`, then call
+`value()` for success or `error()` for failure. `valid == false` indicates
+allocation failure. `write` uses normal class assignment, including copy/move
 and destruction; `read` returns a copy of the field.
 
 `TypeInfo.field_count()` counts selected fields. `FieldInfo.type()` currently

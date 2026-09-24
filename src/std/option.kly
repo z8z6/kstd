@@ -1,69 +1,38 @@
 module std.option;
 
-import std.alloc;
-
-// Compiler-provided operations on a concrete T. They construct into raw
-// storage and destroy only objects that were actually constructed.
-fn __size_of<T>(probe: *T) -> usize { return 0; }
-fn __init_copy<T>(destination: *T, source: *T) -> void {}
-fn __drop_at<T>(pointer: *T) -> void {}
-
-// A value or a failure code. err == 0 with !ok means "no value".
-// Storage is allocated only for a present value, so T needs no default init.
-pub class Option<T> {
-  pub ok: bool;
-  pub err: i32;
-  data: *T;
-
-  pub init() {
-    ok = false;
-    err = 0;
-    data = 0 as *T;
-  }
-
-  deinit() {
-    if data as usize != 0 {
-      __drop_at<T>(data);
-      std.alloc.release(data as *u8);
+// One parsed command-line option. Both strings are borrowed from the caller.
+// The name includes its dashes, for example "--output" or "-o".
+pub class Option {
+  pub matched: bool;
+  pub has_value: bool;
+  pub value: *c.char;
+  pub init(name: *c.char, argument: *c.char) {
+    matched = false;
+    has_value = false;
+    value = 0 as*c.char;
+    if name as usize == 0 || argument as usize == 0 {
+      return;
     }
-  }
-
-  pub fn copy(other: *Option<T>) {
-    ok = false;
-    err = other.err;
-    data = 0 as *T;
-    if other.ok {
-      data = std.alloc.allocate(__size_of<T>(0 as *T)) as *T;
-      if data as usize == 0 {
-        err = 12;
+    let index: usize = 0;
+    while true {
+      let expected = *((name as usize + index) as*u8);
+      let actual = *((argument as usize + index) as*u8);
+      if expected == 0 {
+        if actual == 0 {
+          matched = true;
+          return;
+        }
+        if actual == 61 {
+          matched = true;
+          has_value = true;
+          value = (argument as usize + index + 1) as*c.char;
+        }
         return;
       }
-      __init_copy<T>(data, other.data);
-      ok = true;
-      err = 0;
+      if expected != actual {
+        return;
+      }
+      index = index + 1;
     }
   }
-
-  // Precondition: ok is true. The returned value is copied from the option.
-  pub fn value() -> T { return *data; }
-}
-
-pub fn some<T>(value: T) -> Option<T> {
-  let result = Option<T>();
-  result.data = std.alloc.allocate(__size_of<T>(0 as *T)) as *T;
-  if result.data as usize == 0 {
-    result.err = 12;
-    return result;
-  }
-  __init_copy<T>(result.data, &value);
-  result.ok = true;
-  return result;
-}
-
-pub fn none<T>() -> Option<T> { return Option<T>(); }
-
-pub fn failure<T>(code: i32) -> Option<T> {
-  let result = Option<T>();
-  result.err = code;
-  return result;
 }

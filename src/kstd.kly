@@ -10,6 +10,7 @@ import std.io;
 import std.math.integer;
 import std.option;
 import std.reflect;
+import std.result;
 import std.signal;
 import std.string;
 import std.thread;
